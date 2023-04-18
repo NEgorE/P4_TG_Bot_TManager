@@ -1,37 +1,56 @@
 import sqlalchemy as sqlA
+from sqlalchemy.orm import Session
+from sqlalchemy.ext.declarative import declarative_base
 import datetime
 
-class DBclass :
+db_str = 'sqlite:///sqlite3.db'
+DB_engine = sqlA.create_engine(db_str)
+DB_Base = declarative_base()
+DB_metadata = sqlA.MetaData()
+session = Session()
+class Task(DB_Base):
+    __tablename__ = 'tasks'
+    id = sqlA.Column(sqlA.Integer(), primary_key=True)
+    created = sqlA.Column(sqlA.DateTime(), default=datetime.datetime.now())
+    user_id = sqlA.Column(sqlA.Integer(), nullable=False)
+    date = sqlA.Column(sqlA.Date(), nullable=False)
+    time = sqlA.Column(sqlA.Time(), nullable=False)
+    text = sqlA.Column(sqlA.String(100), nullable=False)
+    status = sqlA.Column(sqlA.String(4), nullable=False)
+class User(DB_Base):
+    __tablename__ = 'users'
+    id = sqlA.Column(sqlA.Integer(), primary_key=True, autoincrement=True)
+    username = sqlA.Column(sqlA.Integer(), nullable=False)
+    last_name = sqlA.Column(sqlA.String(20), nullable=True)
+    first_name = sqlA.Column(sqlA.String(120), nullable=False)
+    language_code = sqlA.Column(sqlA.String(3), nullable=True)
+class Sched_item(DB_Base):
+    __tablename__ = 'scheduler'
+    id = sqlA.Column(sqlA.Integer(), primary_key=True, autoincrement=True)
+    task_id = sqlA.Column(sqlA.Integer(), nullable=False)
+    time = sqlA.Column(sqlA.Time(), nullable=False)
 
-    def __init__(self, db_str) -> None:
-        
-        DB_engine = sqlA.create_engine(db_str)
-        DB_metadata = sqlA.MetaData()
 
-        tasks = sqlA.Table('tasks', DB_metadata,
-                        sqlA.Column('id' , sqlA.Integer(), primary_key=True),
-                        sqlA.Column('created' , sqlA.DateTime(), default=datetime.datetime.now()),
-                        sqlA.Column('user_id' , sqlA.Integer(), nullable=False),
-                        sqlA.Column('date' , sqlA.Date(), nullable=False),
-                        sqlA.Column('time' , sqlA.Time(), nullable=False),
-                        sqlA.Column('text' , sqlA.String(100), nullable=False),
-                        sqlA.Column('status' , sqlA.String(4), nullable=False)
-        )
-        scheduler = sqlA.Table('scheduler', DB_metadata,
-                            sqlA.Column('id' , sqlA.Integer(), primary_key=True, autoincrement=True),
-                            sqlA.Column('task_id' , sqlA.Integer(), nullable=False),
-                            sqlA.Column('time' , sqlA.Time(), nullable=False)
-        )
-        users = sqlA.Table('users', DB_metadata,
-                            sqlA.Column('id' , sqlA.Integer(), primary_key=True, autoincrement=True),
-                            sqlA.Column('username' , sqlA.Integer(), nullable=False),
-                            sqlA.Column('last_name' , sqlA.String(20), nullable=True),
-                            sqlA.Column('first_name' , sqlA.String(120), nullable=False),
-                            sqlA.Column('language_code' , sqlA.String(3), nullable=True)
-        )
+def db_init():
+    DB_Base.metadata.create_all(DB_engine)
+    print('DB init done!!!')
+    sb_session_open()
+    
+def sb_session_open():
+    global session
+    session = Session(bind=DB_engine)
+    print('Session is open!!!')
 
-        DB_metadata.create_all(DB_engine)
-        print('DB init done!!!')
-
-    def __del__(self) :
-        print('DB class was delete !!!')
+    #def __init__(self, db_str) -> None:
+    #    
+    #    
+    #    
+    #    print('DB init done!!!')
+    #    self.open_session()
+#
+    #def open_session(self) :
+    #    self.session = Session(bind=self.DB_engine)
+    #    print('Session is open!!!')
+#
+    #def __del__(self) :
+    #    print('DB class was delete !!!')
