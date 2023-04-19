@@ -20,6 +20,7 @@ def main():
 
     @bot.message_handler(commands=["start"])
     def start(msg) :
+        print('call /start')
         print(msg.from_user.id, msg.from_user.username, msg.from_user.first_name, msg.from_user.last_name, msg.from_user.language_code)
         dbc.sb_session_open()
         print(dbc.session.query(User).filter(User.tg_id == msg.from_user.id).count())
@@ -38,6 +39,16 @@ def main():
             bot.send_message(msg.chat.id, mt[lang]['str1'] % {'user_first_name' : msg.from_user.first_name})
 
 
+    @bot.message_handler(commands=["add"])
+    def add(msg):
+        print('call /start')
+
+    
+
+    
+
+
+
 
 
 
@@ -45,6 +56,13 @@ def main():
     def help(msg) :
         print('call /help')
         bot.send_message(msg.chat.id, mt[lang]['help'])
+
+
+
+
+    @bot.message_handler(content_types=["text"])
+    def unk(msg):
+        bot.send_message(msg.chat.id, mt[lang]['unk1'])
 
     bot.polling(none_stop = True)
 

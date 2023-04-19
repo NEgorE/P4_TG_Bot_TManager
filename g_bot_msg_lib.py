@@ -1,5 +1,6 @@
 msg_text = {
     'en' : {
+        'unk1' : 'Sorry, I don\'t know this command. Use /help for show BOT options.',
         'str1' : 'Hi here, %(user_first_name)s!!!\nUse /help for explore BOT options.',
         'str2' : 'Hi here again, %(user_first_name)s!!!\nUse /help for show BOT options.',
         'help' : '''
