@@ -9,7 +9,7 @@ DB_Base = declarative_base()
 DB_metadata = sqlA.MetaData()
 class Task(DB_Base):
     __tablename__ = 'tasks'
-    id = sqlA.Column(sqlA.Integer(), primary_key=True)
+    id = sqlA.Column(sqlA.Integer(), primary_key=True, autoincrement=True)
     created = sqlA.Column(sqlA.DateTime(), default=datetime.datetime.now())
     user_id = sqlA.Column(sqlA.Integer(), nullable=False)
     date = sqlA.Column(sqlA.Date(), nullable=False)
