@@ -16,7 +16,8 @@ def main():
         else :
             return in_str
 
-
+    
+    date_format = '%Y-%m-%d'
     lang = 'en'
     dbc.db_init()
 
@@ -51,6 +52,7 @@ def main():
         if com == 'INIT' :
             input_values = {}
             input_values['task_id'] = get_max_task_id() + 1
+            input_values['task_user_id'] = msg.from_user.id
             bot.send_message(msg.chat.id, mt[lang]['add_str1'])
             bot.register_next_step_handler(msg, add, 'INPUT_DATE')
         elif com == 'INPUT_DATE' :
@@ -69,13 +71,14 @@ def main():
                 else :
                     bot.register_next_step_handler(msg, add, 'INPUT_NOTIF_TIME')
             else :
-                input_values['task_time'] = in_time
                 if com == 'INPUT_TIME' :
+                    input_values['task_time'] = in_time
                     bot.send_message(msg.chat.id, mt[lang]['add_str3'])
                     bot.register_next_step_handler(msg, add, 'TASK_TEXT')
                 else :
+                    input_values['notif_time'] = in_time
                     input_values['task_status'] = 'ToDo'
-                save_task(input_values)
+                    save_task(msg.chat.id, input_values)
         elif com == 'TASK_TEXT' :
             in_task_text = msg.text
             if in_task_text == '' :
@@ -89,20 +92,41 @@ def main():
         elif com == 'NOTIF_NEED' :
             in_notif_need = msg.text
             if in_notif_need == 'Y' :
+                input_values['notif_need'] = in_notif_need
                 bot.send_message(msg.chat.id, mt[lang]['add_str6'])
                 bot.register_next_step_handler(msg, add, 'INPUT_NOTIF_TIME')
             elif in_notif_need == 'N' :
+                input_values['notif_need'] = in_notif_need
                 input_values['task_status'] = 'ToDo'
-                save_task(input_values)
+                save_task(msg.chat.id, input_values)
             else :
                 bot.send_message(msg.chat.id, mt[lang]['add_str7'])
-                bot.send_message(msg.chat.id, mt[lang]['add_str6'])
+                bot.send_message(msg.chat.id, mt[lang]['add_str5'])
                 bot.register_next_step_handler(msg, add, 'NOTIF_NEED')
         
         print(input_values)
     
 
-    def save_task(in_dict) :
+    def save_task(chat_id, in_dict) :
+        new_task = Task(
+            id = in_dict['task_id'],
+            user_id = in_dict['task_user_id'],
+            date = datetime.datetime.strptime(in_dict['task_date'], date_format),
+            time = datetime.time.fromisoformat(in_dict['task_time'] + ':00'),
+            text = in_dict['task_text'],
+            status = in_dict['task_status']
+        )
+        dbc.sb_session_open()
+        dbc.session.add(new_task)
+        #if in_dict['notif_need'] == 'Y' :
+        #    new_s_item = Sched_item(
+        #        task_id = in_dict['task_id'],
+        #        time = in_dict['notif_time']
+        #    )
+        #    dbc.session.add(new_s_item)
+        #
+        dbc.session.commit()
+        bot.send_message(chat_id, mt[lang]['add_str8'])
         print('Task saved!!!')
 
 
@@ -124,7 +148,6 @@ def main():
 
 
     def check_date(msg) :
-        date_format = '%Y-%m-%d'
         return_str = ''
         try:
             dateObject = datetime.datetime.strptime(msg.text, date_format)

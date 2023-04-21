@@ -9,8 +9,8 @@ DB_Base = declarative_base()
 DB_metadata = sqlA.MetaData()
 class Task(DB_Base):
     __tablename__ = 'tasks'
-    id = sqlA.Column(sqlA.Integer(), primary_key=True, autoincrement=True)
-    created = sqlA.Column(sqlA.DateTime(), default=datetime.datetime.now())
+    id = sqlA.Column(sqlA.Integer(), primary_key=True)
+    created_dt = sqlA.Column(sqlA.DateTime(), default=datetime.datetime.now())
     user_id = sqlA.Column(sqlA.Integer(), nullable=False)
     date = sqlA.Column(sqlA.Date(), nullable=False)
     time = sqlA.Column(sqlA.Time(), nullable=False)
@@ -19,6 +19,7 @@ class Task(DB_Base):
 class User(DB_Base):
     __tablename__ = 'users'
     id = sqlA.Column(sqlA.Integer(), primary_key=True, autoincrement=True)
+    created_dt = sqlA.Column(sqlA.DateTime(), default=datetime.datetime.now())
     tg_id = sqlA.Column(sqlA.Integer(), nullable=False)
     username = sqlA.Column(sqlA.Integer(), nullable=False)
     last_name = sqlA.Column(sqlA.String(20), nullable=False)
@@ -27,6 +28,7 @@ class User(DB_Base):
 class Sched_item(DB_Base):
     __tablename__ = 'scheduler'
     id = sqlA.Column(sqlA.Integer(), primary_key=True, autoincrement=True)
+    created_dt = sqlA.Column(sqlA.DateTime(), default=datetime.datetime.now())
     task_id = sqlA.Column(sqlA.Integer(), nullable=False)
     time = sqlA.Column(sqlA.Time(), nullable=False)
 

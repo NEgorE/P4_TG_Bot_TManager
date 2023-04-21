@@ -17,6 +17,7 @@ Available commands:
         'add_str5' : 'Need notification? (input Y or N): ',
         'add_str6' : 'Input notif time (using format HH:MM)',
         'add_str7' : 'Wrong input!!!',
+        'add_str8' : 'Task was created :)',
         'ch_d_str1' : 'It\'s not correct date!',
         'ch_t_str1' : 'It\'s not correct time!'
     }
