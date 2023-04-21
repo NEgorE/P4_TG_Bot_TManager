@@ -3,7 +3,7 @@ import datetime
 from token_str import token
 import g_sqlA as dbc
 from g_sqlA import User, Task, Sched_item
-from sqlalchemy import func
+from sqlalchemy import func, desc
 from g_bot_msg_lib import msg_text as mt
 
 input_values = {}
@@ -107,6 +107,35 @@ def main():
         print(input_values)
     
 
+    @bot.message_handler(commands=["show"])
+    def show(msg) :
+        print(f'User {msg.from_user.id} call /show')
+        dbc.sb_session_open()
+        if msg.text == '/show' :
+            res = dbc.session.query(Task).order_by(Task.created_dt , Task.time).limit(10).all()
+            show_tasks(res, msg.chat.id)
+        
+        dbc.session.close()
+    
+    def show_tasks(lfp, msg_id) :
+        answ = ''
+        cur_date = ''
+        pref_date = ''
+        for task in lfp :
+            cur_date = task.date
+            if cur_date != pref_date : 
+                answ += f'\n{cur_date}:'
+            out_time = task.time.strftime('%H:%M')
+            answ += f'\n    - {out_time} : {task.text} (taskId: {task.id})'
+            pref_date = cur_date
+        answ += ''
+        if len(answ.strip()) > 0 :
+            bot.send_message(msg_id, answ)
+        else :
+            bot.send_message(msg_id, 'List is empty :(')
+
+
+
     def save_task(chat_id, in_dict) :
         new_task = Task(
             id = in_dict['task_id'],
@@ -118,13 +147,13 @@ def main():
         )
         dbc.sb_session_open()
         dbc.session.add(new_task)
-        #if in_dict['notif_need'] == 'Y' :
-        #    new_s_item = Sched_item(
-        #        task_id = in_dict['task_id'],
-        #        time = in_dict['notif_time']
-        #    )
-        #    dbc.session.add(new_s_item)
-        #
+        if in_dict['notif_need'] == 'Y' :
+            new_s_item = Sched_item(
+                task_id = in_dict['task_id'],
+                time = datetime.time.fromisoformat(in_dict['notif_time'] + ':00')
+            )
+            dbc.session.add(new_s_item)
+        
         dbc.session.commit()
         bot.send_message(chat_id, mt[lang]['add_str8'])
         print('Task saved!!!')
