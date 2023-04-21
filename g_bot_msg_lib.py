@@ -9,6 +9,16 @@ Available commands:
 /add                     - add new task
 /del                      - del task by ID
 /clear <date>   - dell all tasks for 1 day (del all tasks if date is empty)
-/help                   - show all available commands'''
+/help                   - show all available commands''',
+        'add_str1' : 'Input date pls (using format YYYY-MM-DD)',
+        'add_str2' : 'Input task time (using format HH:MM)',
+        'add_str3' : 'Input task text',
+        'add_str4' : 'Task text cant be empty!!!',
+        'add_str5' : 'Need notification? (input Y or N): ',
+        'add_str6' : 'Input notif time (using format HH:MM)',
+        'add_str7' : 'Wrong input!!!',
+        'add_str8' : 'Task was created :)',
+        'ch_d_str1' : 'It\'s not correct date!',
+        'ch_t_str1' : 'It\'s not correct time!'
     }
 }
