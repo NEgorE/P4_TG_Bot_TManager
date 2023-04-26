@@ -114,9 +114,13 @@ def main():
         if msg.text == '/show' :
             res = dbc.session.query(Task).order_by(Task.created_dt , Task.time).limit(10).all()
             show_tasks(res, msg.chat.id)
-        
+        else :
+            p_date_in = msg.text[msg.text.find(' ')+1:len(msg.text)]
+            res = dbc.session.query(Task).filter(Task.date == p_date_in).order_by(Task.created_dt , Task.time).limit(10).all()
+            show_tasks(res, msg.chat.id)
         dbc.session.close()
     
+
     def show_tasks(lfp, msg_id) :
         answ = ''
         cur_date = ''
@@ -126,14 +130,13 @@ def main():
             if cur_date != pref_date : 
                 answ += f'\n{cur_date}:'
             out_time = task.time.strftime('%H:%M')
-            answ += f'\n    - {out_time} : {task.text} (taskId: {task.id})'
+            answ += f'\n    - {out_time} : {task.text} (task ID: {task.id})'
             pref_date = cur_date
         answ += ''
         if len(answ.strip()) > 0 :
             bot.send_message(msg_id, answ)
         else :
-            bot.send_message(msg_id, 'List is empty :(')
-
+            bot.send_message(msg_id, mt[lang]['str3'])
 
 
     def save_task(chat_id, in_dict) :
