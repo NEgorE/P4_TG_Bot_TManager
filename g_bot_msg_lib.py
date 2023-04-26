@@ -3,6 +3,7 @@ msg_text = {
         'unk1' : 'Sorry, I don\'t know this command. Use /help for show BOT options.',
         'str1' : 'Hi here, %(user_first_name)s!!!\nUse /help for explore BOT options.',
         'str2' : 'Hi here again, %(user_first_name)s!!!\nUse /help for show BOT options.',
+        'str3' : 'List is empty :( \nUse /show without param or with correct date!',
         'help' : '''
 Available commands:
 /show <date>    - show all tasks for date (first 10 if date is empty)
