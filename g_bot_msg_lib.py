@@ -9,7 +9,7 @@ Available commands:
 /show <date>    - show all tasks for date (first 10 if date is empty)
 /add                     - add new task
 /del                      - del task by ID
-/clear <date>   - dell all tasks for 1 day (del all tasks if date is empty)
+/clear <date>   - dell all tasks for 1 day
 /help                   - show all available commands''',
         'add_str1' : 'Input date pls (using format YYYY-MM-DD)',
         'add_str2' : 'Input task time (using format HH:MM)',
