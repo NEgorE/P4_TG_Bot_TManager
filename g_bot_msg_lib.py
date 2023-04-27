@@ -8,8 +8,7 @@ msg_text = {
 Available commands:
 /show <date>    - show all tasks for date (first 10 if date is empty)
 /add                     - add new task
-/del                      - del task by ID
-/clear <date>   - dell all tasks for 1 day
+/del  <param>   - del task by ID or all tasks for date
 /help                   - show all available commands''',
         'add_str1' : 'Input date pls (using format YYYY-MM-DD)',
         'add_str2' : 'Input task time (using format HH:MM)',
@@ -19,6 +18,9 @@ Available commands:
         'add_str6' : 'Input notif time (using format HH:MM)',
         'add_str7' : 'Wrong input!!!',
         'add_str8' : 'Task was created :)',
+        'del_str1' : 'I can\'t del all tasks.\nYou have to input at least 1 param (Date or Task ID) \nafter command /del !!!',
+        'del_str2' : 'Wrond input!!!!! \nUse /del with correct task ID or date.',
+        'del_str3' : 'Task was deleted :(',
         'ch_d_str1' : 'It\'s not correct date!',
         'ch_t_str1' : 'It\'s not correct time!'
     }

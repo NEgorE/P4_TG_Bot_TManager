@@ -123,6 +123,39 @@ def main():
         dbc.session.close()
     
 
+    @bot.message_handler(commands=["del"])
+    def del_tasks(msg) :
+        if msg.text == '/del' :
+            bot.send_message(msg.chat.id, mt[lang]['del_str1'])
+        else :
+            param_in = msg.text[msg.text.find(' ')+1:len(msg.text)]
+            if param_in.isdigit() :
+                dbc.sb_session_open()
+                for_del_id = dbc.session.query(Task.id).filter(Task.id == param_in, Task.user_id == msg.from_user.id).all()
+                if len(for_del_id) != 1 :
+                    bot.send_message(msg.chat.id, mt[lang]['del_str2'])
+                    print('Smth wrong')
+                    dbc.session.close()
+                else :
+                    for_del = dbc.session.query(Task).filter(Task.id == param_in, Task.user_id == msg.from_user.id).one()
+                    dbc.session.delete(for_del)
+                    dbc.session.commit()
+                    dbc.session.close()
+                    bot.send_message(msg.chat.id, mt[lang]['del_str3'])
+            else :
+                dbc.sb_session_open()
+                for_del_id = dbc.session.query(Task.id).filter(Task.date == param_in, Task.user_id == msg.from_user.id).all()
+                if len(for_del_id) < 1 :
+                    bot.send_message(msg.chat.id, mt[lang]['del_str2'])
+                    print('Smth wrong')
+                    dbc.session.close()
+                else :
+                    for_del = dbc.session.query(Task).filter(Task.date == param_in, Task.user_id == msg.from_user.id).delete(synchronize_session='fetch')
+                    dbc.session.commit()
+                    dbc.session.close()
+                    bot.send_message(msg.chat.id, mt[lang]['del_str3'])
+
+
     def show_tasks(lfp, msg_id) :
         answ = ''
         cur_date = ''
