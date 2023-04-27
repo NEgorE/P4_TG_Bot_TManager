@@ -35,6 +35,7 @@ def main():
         else :
             new_user = User(
                 tg_id = msg.from_user.id,
+                created_dt = datetime.datetime.now(),
                 username = replace_none(msg.from_user.username, str(msg.from_user.id)),
                 last_name = replace_none(msg.from_user.last_name, str(msg.from_user.id)),
                 first_name = replace_none(msg.from_user.first_name, str(msg.from_user.id)),
@@ -42,6 +43,7 @@ def main():
             )
             dbc.session.add(new_user)
             dbc.session.commit()
+            dbc.session.close()
             bot.send_message(msg.chat.id, mt[lang]['str1'] % {'user_first_name' : msg.from_user.first_name})
 
 
@@ -112,14 +114,47 @@ def main():
         print(f'User {msg.from_user.id} call /show')
         dbc.sb_session_open()
         if msg.text == '/show' :
-            res = dbc.session.query(Task).order_by(Task.created_dt , Task.time).limit(10).all()
+            res = dbc.session.query(Task).filter(Task.user_id== msg.from_user.id).order_by(Task.created_dt , Task.time).limit(10).all()
             show_tasks(res, msg.chat.id)
         else :
             p_date_in = msg.text[msg.text.find(' ')+1:len(msg.text)]
-            res = dbc.session.query(Task).filter(Task.date == p_date_in).order_by(Task.created_dt , Task.time).limit(10).all()
+            res = dbc.session.query(Task).filter(Task.date == p_date_in, Task.user_id== msg.from_user.id).order_by(Task.created_dt , Task.time).all()
             show_tasks(res, msg.chat.id)
         dbc.session.close()
     
+
+    @bot.message_handler(commands=["del"])
+    def del_tasks(msg) :
+        if msg.text == '/del' :
+            bot.send_message(msg.chat.id, mt[lang]['del_str1'])
+        else :
+            param_in = msg.text[msg.text.find(' ')+1:len(msg.text)]
+            if param_in.isdigit() :
+                dbc.sb_session_open()
+                for_del_id = dbc.session.query(Task.id).filter(Task.id == param_in, Task.user_id == msg.from_user.id).all()
+                if len(for_del_id) != 1 :
+                    bot.send_message(msg.chat.id, mt[lang]['del_str2'])
+                    print('Smth wrong')
+                    dbc.session.close()
+                else :
+                    for_del = dbc.session.query(Task).filter(Task.id == param_in, Task.user_id == msg.from_user.id).one()
+                    dbc.session.delete(for_del)
+                    dbc.session.commit()
+                    dbc.session.close()
+                    bot.send_message(msg.chat.id, mt[lang]['del_str3'])
+            else :
+                dbc.sb_session_open()
+                for_del_id = dbc.session.query(Task.id).filter(Task.date == param_in, Task.user_id == msg.from_user.id).all()
+                if len(for_del_id) < 1 :
+                    bot.send_message(msg.chat.id, mt[lang]['del_str2'])
+                    print('Smth wrong')
+                    dbc.session.close()
+                else :
+                    for_del = dbc.session.query(Task).filter(Task.date == param_in, Task.user_id == msg.from_user.id).delete(synchronize_session='fetch')
+                    dbc.session.commit()
+                    dbc.session.close()
+                    bot.send_message(msg.chat.id, mt[lang]['del_str3'])
+
 
     def show_tasks(lfp, msg_id) :
         answ = ''
@@ -142,6 +177,7 @@ def main():
     def save_task(chat_id, in_dict) :
         new_task = Task(
             id = in_dict['task_id'],
+            created_dt = datetime.datetime.now(),
             user_id = in_dict['task_user_id'],
             date = datetime.datetime.strptime(in_dict['task_date'], date_format),
             time = datetime.time.fromisoformat(in_dict['task_time'] + ':00'),
@@ -153,11 +189,13 @@ def main():
         if in_dict['notif_need'] == 'Y' :
             new_s_item = Sched_item(
                 task_id = in_dict['task_id'],
+                created_dt = datetime.datetime.now(),
                 time = datetime.time.fromisoformat(in_dict['notif_time'] + ':00')
             )
             dbc.session.add(new_s_item)
         
         dbc.session.commit()
+        dbc.session.close()
         bot.send_message(chat_id, mt[lang]['add_str8'])
         print('Task saved!!!')
 
